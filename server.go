@@ -103,7 +103,7 @@ type Config struct {
 	// If BaseContext is nil, the default is context.Background().
 	// If this is defined, then it MUST return a non-nil context
 	BaseContext func() context.Context
-	
+
 	// TaskCheckInterval specifies the interval between checks for new tasks to process when all queues are empty.
 	//
 	// If unset, zero or a negative value, the interval is set to 1 second.
@@ -592,6 +592,7 @@ func NewServer(r RedisConnOpt, cfg Config) *Server {
 // skipped and the task will be immediately archived instead.
 type Handler interface {
 	ProcessTask(context.Context, *Task) error
+	ProcessTaskWithResult(ctx context.Context, task *Task) ([]byte, error)
 }
 
 // The HandlerFunc type is an adapter to allow the use of
@@ -600,9 +601,24 @@ type Handler interface {
 // Handler that calls f.
 type HandlerFunc func(context.Context, *Task) error
 
+type HandlerFuncWithResult func(context.Context, *Task) ([]byte, error)
+
 // ProcessTask calls fn(ctx, task)
 func (fn HandlerFunc) ProcessTask(ctx context.Context, task *Task) error {
-	return fn(ctx, task)
+	return fn.ProcessTask(ctx, task)
+}
+
+func (fn HandlerFuncWithResult) ProcessTask(ctx context.Context,
+	task *Task) error {
+	return fn.ProcessTask(ctx, task)
+}
+
+func (fn HandlerFuncWithResult) ProcessTaskWithResult(ctx context.Context, task *Task) ([]byte, error) {
+	return fn.ProcessTaskWithResult(ctx, task)
+}
+
+func (fn HandlerFunc) ProcessTaskWithResult(ctx context.Context, task *Task) ([]byte, error) {
+	return fn.ProcessTaskWithResult(ctx, task)
 }
 
 // ErrServerClosed indicates that the operation is now illegal because of the server has been shutdown.
