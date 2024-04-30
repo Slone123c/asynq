@@ -605,7 +605,7 @@ type HandlerFuncWithResult func(context.Context, *Task) ([]byte, error)
 
 // ProcessTask calls fn(ctx, task)
 func (fn HandlerFunc) ProcessTask(ctx context.Context, task *Task) error {
-	return fn.ProcessTask(ctx, task)
+	return fn(ctx, task)
 }
 
 func (fn HandlerFuncWithResult) ProcessTask(ctx context.Context,
