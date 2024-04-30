@@ -51,6 +51,11 @@ func (mux *ServeMux) ProcessTask(ctx context.Context, task *Task) error {
 	return h.ProcessTask(ctx, task)
 }
 
+func (mux *ServeMux) ProcessTaskWithResult(ctx context.Context, task *Task) ([]byte, error) {
+	h, _ := mux.Handler(task)
+	return h.ProcessTaskWithResult(ctx, task)
+}
+
 // Handler returns the handler to use for the given task.
 // It always return a non-nil handler.
 //
