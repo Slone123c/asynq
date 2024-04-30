@@ -139,6 +139,14 @@ func (mux *ServeMux) HandleFunc(pattern string, handler func(context.Context, *T
 	mux.Handle(pattern, HandlerFunc(handler))
 }
 
+func (mux *ServeMux) HandleFuncWithResult(pattern string,
+	handler func(context.Context, *Task) ([]byte, error)) {
+	if handler == nil {
+		panic("asynq: nil handler")
+	}
+	mux.Handle(pattern, HandlerFuncWithResult(handler))
+}
+
 // Use appends a MiddlewareFunc to the chain.
 // Middlewares are executed in the order that they are applied to the ServeMux.
 func (mux *ServeMux) Use(mws ...MiddlewareFunc) {
@@ -152,5 +160,5 @@ func NotFound(ctx context.Context, task *Task) error {
 	return fmt.Errorf("handler not found for task %q", task.Type())
 }
 
-// NotFoundHandler returns a simple task handler that returns a ``not found`` error.
+// NotFoundHandler returns a simple task handler that returns a “not found“ error.
 func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
